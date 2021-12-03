@@ -61,6 +61,8 @@ def set_up_day(day):
     create_directory(file_info)
 
     create_files(file_info)
+
+    os.chdir(file_info['directory'])
 if __name__ == '__main__':
     
     day = ''
