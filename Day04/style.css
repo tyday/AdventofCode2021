@@ -1,0 +1,19 @@
+.position{
+    padding:3px;
+}
+.board{
+    margin:10px;
+    padding:3px;
+    background: #cecece;
+    font-size: x-small;
+}
+.boards{
+    display: flex;
+    flex-wrap: wrap;
+}
+.marked{
+    color:#8f8f8f;
+}
+.unmarked{
+    color:#000;
+}

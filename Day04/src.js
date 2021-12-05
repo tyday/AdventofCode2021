@@ -6,7 +6,9 @@ if (typeof String.prototype.trim === 'undefined') {
   };
 }
 
-let COLOR = {
+const timer = ms => new Promise(res => setTimeout(res, ms))
+
+const COLOR = {
   BLACK: '\x1b[30m',
   RED: '\x1b[31m',
   GREEN: '\x1b[32m',
@@ -17,15 +19,17 @@ let COLOR = {
   GREY: '\x1b[37m',
   END: '\x1b[0m',
 };
-
+const DELAY = 200;
 class Game {
   constructor() {
     this.turns = [];
     this.bingo_cards = {};
     this.positions = {};
   }
-
-  simulate_game() {
+  game_turn (){
+    
+  }
+  async simulate_game() {
     let games = [];
     for (const [key, value] of Object.entries(this.bingo_cards)) {
       games.push(value.id);
@@ -53,6 +57,7 @@ class Game {
         }
       });
       turn_count++;
+      await timer(DELAY)
     }
   }
 }
@@ -64,9 +69,14 @@ class Position {
     this.row = row;
     this.card_number = card_number;
     this.marked = marked;
+    this.node = null;
+  }
+  freeze(){
+    this.node.classList.add('unmarked')
   }
   mark() {
     this.marked = true;
+    this.node.classList.add('marked')
     return { card_id: this.card_number, row: this.row, col: this.col };
   }
   repr() {
@@ -75,13 +85,17 @@ class Position {
     else return value;
   }
   html() {
-    let value = `${this.val}`.padStart(2, '0');
-    if (this.marked) {
-      value = `<span class='position marked'>${value}</>`;
-    } else {
-      value = `<span class='position'>${value}</>`;
-    }
-    return value;
+    const newSpan = document.createElement("span")
+    newSpan.classList.add("position")
+    newSpan.classList.add(`pos${this.val}`)
+
+    // let spacer = this.val < 10 ? "&nbsp;&nbsp;" : ""
+    let spacer = this.val < 10 ? "\u00a0\u00a0" : ""
+    const newContent = document.createTextNode(`${spacer}${this.val}`)
+
+    newSpan.appendChild(newContent)
+    this.node = newSpan
+    return newSpan
   }
 }
 
@@ -101,16 +115,33 @@ class Bingo_Card {
       console.log(print_string);
     });
   }
+  get_row_html(row){
+    // create <div class="row">
+    // and add <span>#</span>
+    // for each position
+    const row_html = document.createElement("div");
+    row_html.classList.add("row")
 
-  // is_row_complete(row) {
-  //   let positions = this.matrix[row];
-  //   positions.forEach((e) => {
-  //     if (e.marked === false) {
-  //       return false;
-  //     }
-  //   });
-  //   return true;
-  // }
+    row.forEach(position => {
+      const pos_html = position.html()
+      row_html.appendChild(pos_html)
+    })
+    return row_html
+  }
+  get_html(){
+    // create <div class="board"> 
+    // For row in matric
+    // get row_html
+    const card_html = document.createElement("div");
+    card_html.classList.add("board")
+
+    this.matrix.forEach(row => {
+      const row_html = this.get_row_html(row) 
+      card_html.appendChild(row_html)
+    })
+    return card_html
+  }
+
   is_row_complete(row) {
     for (let col = 0; col < 5; col++) {
       if (this.matrix[row][col].marked === false) {
@@ -134,6 +165,7 @@ class Bingo_Card {
       row.forEach((position) => {
         if (position.marked === false) {
           score += position.val;
+          position.freeze();  // adds unmarked to classlist to prevent color from changing
         }
       });
     });
@@ -184,7 +216,8 @@ async function main() {
     [null, null, null, null, null],
   ];
   let row = 0;
-
+  let app = document.getElementById("app")
+  
   data.forEach((line) => {
     if (line == '') {
       // # We've reached the end of a bingo card
@@ -200,6 +233,9 @@ async function main() {
         [null, null, null, null, null],
         [null, null, null, null, null],
       ];
+
+      //  add the card to the dom
+      app.appendChild(card.get_html())
       row = 0;
     } else {
       let row_data = line
