@@ -5,6 +5,7 @@
 
 import time
 
+
 def part_one(data):
     part_one = data[:]
     day = 0
@@ -26,35 +27,37 @@ def part_one(data):
     print(f'Time: {time.time() - start_time: .2f}')
 
 
-def part_two(data, debug=False):
+def part_two(data):
     day = 1
-    adult_fish = [0,0,0,0,0,0,0]
-    baby_fish =  [0,0,0,0,0,0,0]
+    adult_fish = [0, 0, 0, 0, 0, 0, 0]
+    baby_fish = [0, 0, 0, 0, 0, 0, 0]
     for fish in data:
         adult_fish[fish] += 1
     print("Start fish: ", adult_fish)
 
     while True:
         for step in range(7):
-            baby_step = step +2
+            baby_step = step + 2
             baby_fish[baby_step % 7] = adult_fish[step]
             adult_fish[step] = adult_fish[step] + baby_fish[step]
             baby_fish[step] = 0
             # print(f'After {day}: [{sum(adult_fish)+sum(baby_fish)}]- A {adult_fish} - B {baby_fish}')
             # input()
             if day == 256:
-                print(f'After {day}: [{sum(adult_fish)+sum(baby_fish)}]- A {adult_fish} - B {baby_fish}')
+                print(
+                    f'After {day}: [{sum(adult_fish)+sum(baby_fish)}]- A {adult_fish} - B {baby_fish}')
                 return
             day += 1
-    
+
+
 if __name__ == '__main__':
     data = ''
     with open('/home/pi/Programming/AdventOfCode/2021/Day06/input.txt') as f:
         data = f.read().strip()
         data = data.split('\n')
-    
+
     data = [int(d) for d in data[0].split(',')]
-    test_data = [3,4,3,1,2]
+    test_data = [3, 4, 3, 1, 2]
 
     # part_one(data)
 
