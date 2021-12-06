@@ -1,5 +1,6 @@
 import os, requests, sys
 from settings import session
+from datetime import datetime
 
 def get_file_names(day):
     file_location = os.path.dirname(os.path.abspath(__file__))
@@ -9,10 +10,10 @@ def get_file_names(day):
     day_name = f'Day {day:02d}'
     return {
         'directory': directory_name,
-        'py_name': py_name,
-        'data_name': data_name,
-        'day_name': day_name,
-        'day': day
+        'py_name': "app.py",       # hardcoding py_name
+        'data_name': "input.txt",   # and app
+        'day_name': data_name,  # because I didn't like dates
+        'day': day              # as file names
     }
 def create_directory(file_info):
     print(f'Attempting to create: {file_info["directory"]}')
@@ -29,7 +30,8 @@ if __name__ == '__main__':
         data = data.split('\\n')"""
     with open(file_name, 'w') as f:
         f.write(f'# Advent of Code {day}\n')
-        f.write(f'#\n# Creator: Ty Day\n\n\n')
+        f.write(f'#\n# Created: {datetime.now():%m-%d-%Y %H:%M:%S}\n')
+        f.write(f'# Creator: Ty Day\n\n\n')
         f.write(main)
 def create_data_file(file_name,day):
     cookies = {'session':session }
@@ -41,6 +43,7 @@ def create_data_file(file_name,day):
         print(f"Could not connect to AoC server: {page.status_code}")
 
 def create_files(file_info):
+    # Create python file
     print(f'Attempting to create file: {file_info["py_name"]}')
     if not os.path.exists(file_info['py_name']):
         create_py_file(file_info['py_name'],file_info['data_name'], file_info['day_name'])
@@ -48,11 +51,13 @@ def create_files(file_info):
     else:
         print(f'File ({file_info["py_name"]}) already exists.')
 
+    # create input file
+    print(f'Attempting to create file: {file_info["data_name"]}')
     if not os.path.exists(file_info['data_name']):
         create_data_file(file_info['data_name'], file_info['day'])
         print('File created')
     else:
-        print(f'File ({file_info["py_name"]}) already exists.')
+        print(f'File ({file_info["data_name"]}) already exists.')
         
 
 def set_up_day(day):
@@ -67,20 +72,19 @@ if __name__ == '__main__':
     
     day = ''
     try:
-        day = int(sys.argv[1])
+        if len(sys.argv) > 1:
+            day = int(sys.argv[1])
     except Exception as e:
         print(e)
     
     if day == '':
-        print("need to indicate a day")
-        day = 5
+        today = datetime.now()
+        if today.month == 12:
+            day = datetime.now().day
+            print(f"Assuming date is today: {today}")
+            set_up_day(day)
+        else:
+            print("must include day")
     # elif os.path.exists(os.join(file_location,)
-    if day != '':
+    elif day != '':
         set_up_day(day)
-        # Create a folder Day{day} // This needs to be padded ie. Day02
-
-        # Create a file in folder named Day02.py
-
-        # Create a file in folder named Day02.txt
-
-        # Fill Day02.txt with data from AoC
