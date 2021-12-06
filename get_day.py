@@ -5,13 +5,13 @@ from datetime import datetime
 def get_file_names(day):
     file_location = os.path.dirname(os.path.abspath(__file__))
     directory_name = os.path.join(file_location,f'Day{day:02d}')
-    py_name = os.path.join(directory_name,f'day{day:02d}.py')
-    data_name = os.path.join(directory_name,f'day{day:02d}.txt')
+    py_name = os.path.join(directory_name,"app.py") # f'day{day:02d}.py')
+    data_name = os.path.join(directory_name,"input.txt") #f'day{day:02d}.txt')
     day_name = f'Day {day:02d}'
     return {
         'directory': directory_name,
-        'py_name': "app.py",       # hardcoding py_name
-        'data_name': "input.txt",   # and app
+        'py_name': py_name,       # hardcoding py_name
+        'data_name': data_name,   # and app
         'day_name': data_name,  # because I didn't like dates
         'day': day              # as file names
     }
@@ -27,7 +27,9 @@ if __name__ == '__main__':
     data = ''
     with open('{data_name}') as f:
         data = f.read().strip()
-        data = data.split('\\n')"""
+        data = data.split('\\n')
+    
+    print(data)"""
     with open(file_name, 'w') as f:
         f.write(f'# Advent of Code {day}\n')
         f.write(f'#\n# Created: {datetime.now():%m-%d-%Y %H:%M:%S}\n')
