@@ -51,7 +51,7 @@ def find_paths(graph, start_vertex,visited):
             results += find_paths(graph,neighbor,local_visited)
         return results
 
-def find_paths_2(graph, start_vertex, visited, visited_once):
+def find_paths_2(graph, start_vertex, visited, visited_once, visited_twice):
     neighbors = graph[start_vertex]['neighbors']
     neighbors = [n for n in neighbors if n not in visited]
     if start_vertex == 'end':
@@ -64,8 +64,13 @@ def find_paths_2(graph, start_vertex, visited, visited_once):
         if  graph[start_vertex]['not_revisitable']:
             if start_vertex == 'start' or start_vertex == 'end':
                 local_visited += [start_vertex]
-            elif start_vertex in local_visited_once:
+            elif visited_twice == True:
                 local_visited += [start_vertex]
+            elif start_vertex in local_visited_once: # and visited_twice:
+                visited_twice = True
+                local_visited += [start_vertex]
+                local_visited += local_visited_once
+                neighbors = [n for n in neighbors if n not in local_visited]
             else:
                 local_visited_once.append(start_vertex)
 
@@ -73,19 +78,16 @@ def find_paths_2(graph, start_vertex, visited, visited_once):
         # neighbors = [n for n in neighbors if n not in visited]
         routes = []
         for neighbor in neighbors: #start,A,b,A,c,A,c,A,end
-            result = find_paths_2(graph,neighbor,local_visited,local_visited_once)
+            result = find_paths_2(graph,neighbor,local_visited,local_visited_once,visited_twice)
             for r in result:
                 routes.append(r)
         [r.insert(0, start_vertex) for r in routes]
-        return routes
+        return routes[:]
 
-def test(a):
-    a = 5
-    print(a)
 
 if __name__ == '__main__':
     data = ''
-    with open('/home/tyrda/LocalProgramming/AdventofCode2021/Day12/test.txt') as f:
+    with open('/home/tyrda/LocalProgramming/AdventofCode2021/Day12/input.txt') as f:
         data = f.read().strip()
         data = data.split('\n')
     
@@ -95,9 +97,10 @@ if __name__ == '__main__':
         graph.graph[vertix]['neighbors']= sorted(graph.graph[vertix]['neighbors'])
     # print(graph.graph)
     # print(find_paths(graph.graph, 'start',[]))
-    routes = find_paths_2(graph.graph, 'start',[], [])
+    routes = find_paths_2(graph.graph, 'start',[], [],False)
+    print(len(routes))
     # r = [print(",".join(r)) for r in routes if r[-1] == 'end']
-    r = [print(",".join(r)) for r in routes if r[-1] == 'end']
+    r = [r for r in routes if r[-1] == 'end']
     print(len(r))
 
     
